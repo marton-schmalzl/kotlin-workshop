@@ -4,6 +4,24 @@ import com.example.demo.model.*
 import com.example.demo.repository.ProjectRepository
 import org.springframework.stereotype.Service
 
+// Extension function for List<TaskSummary>
+fun List<TaskSummary>.categorizeTasks(): Map<String, List<TaskSummary>> {
+    return this.groupBy {
+        when {
+            it.hours == null -> "Uncategorized"
+            it.hours < 20 -> "Small"
+            it.hours <= 40 -> "Medium"
+            else -> "Large"
+        }
+    }
+}
+fun ProjectStatus.isFinished(): Boolean {
+    return when (this) {
+        ProjectStatus.COMPLETED -> true
+        ProjectStatus.PLANNED, ProjectStatus.IN_PROGRESS -> false
+    }
+}
+
 @Service("kotlinProjectService")
 class KotlinProjectService(private val projectRepository: ProjectRepository) : ProjectService {
 
@@ -37,14 +55,8 @@ class KotlinProjectService(private val projectRepository: ProjectRepository) : P
             .maxByOrNull { it.value }
             ?.key
 
-        val tasksByCategory = taskSummaries.groupBy {
-            when {
-                it.hours == null -> "Uncategorized"
-                it.hours < 20 -> "Small"
-                it.hours <= 40 -> "Medium"
-                else -> "Large"
-            }
-        }
+        // Use the extension function to categorize tasks
+        val tasksByCategory = taskSummaries.categorizeTasks()
 
         val totalHoursByStatus = filteredProjects
             .groupBy { it.status.name }
@@ -53,13 +65,19 @@ class KotlinProjectService(private val projectRepository: ProjectRepository) : P
                     .sumOf { it.estimatedHours ?: 0 }
             }
 
+        val projectsByCompletionStatus = projects
+            .groupingBy { if (it.status.isFinished()) "Finished" else "Unfinished" }
+            .eachCount()
+            .mapValues { it.value.toLong() }
+
         return Statistics(
             taskSummaries,
             averageTitleLength,
             averageDescriptionLength,
             mostCommonTaskDescription,
             tasksByCategory,
-            totalHoursByStatus
+            totalHoursByStatus,
+            projectsByCompletionStatus,
         )
     }
 }
