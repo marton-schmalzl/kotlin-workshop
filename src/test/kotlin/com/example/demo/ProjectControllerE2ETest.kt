@@ -183,6 +183,19 @@ class ProjectControllerE2ETest(
             }
     }
 
+    @ParameterizedTest
+    @MethodSource("implementations")
+    fun `GET statistics - projects by completion status`(implementation: String) {
+        System.setProperty("project.service.impl", implementation)
+
+        mockMvc.get("/statistics?includeCompleted=true")
+            .andExpect {
+                status { isOk() }
+                jsonPath("$.projectsByCompletionStatus.Finished") { value(1) } // Adjust based on test data
+                jsonPath("$.projectsByCompletionStatus.Unfinished") { value(2) }
+            }
+    }
+
 
     companion object {
         @JvmStatic

@@ -11,14 +11,16 @@ public class Statistics {
     private String mostCommonTaskDescription;
     private Map<String, List<TaskSummary>> tasksByCategory;
     private Map<String, Integer> totalHoursByStatus;
+    private Map<String, Long> projectsByCompletionStatus;
 
-    public Statistics(List<TaskSummary> taskSummaries, Double averageTitleLength, Double averageDescriptionLength, String mostCommonTaskDescription, Map<String, List<TaskSummary>> tasksByCategory, Map<String, Integer> totalHoursByStatus) {
+    public Statistics(List<TaskSummary> taskSummaries, Double averageTitleLength, Double averageDescriptionLength, String mostCommonTaskDescription, Map<String, List<TaskSummary>> tasksByCategory, Map<String, Integer> totalHoursByStatus, Map<String, Long> projectsByCompletionStatus) {
         this.taskSummaries = taskSummaries;
         this.averageTitleLength = averageTitleLength;
         this.averageDescriptionLength = averageDescriptionLength;
         this.mostCommonTaskDescription = mostCommonTaskDescription;
         this.tasksByCategory = tasksByCategory;
         this.totalHoursByStatus = totalHoursByStatus;
+        this.projectsByCompletionStatus = projectsByCompletionStatus;
     }
 
     public Statistics() {
@@ -71,5 +73,13 @@ public class Statistics {
 
     public void setTotalHoursByStatus(Map<String, Integer> totalHoursByStatus) {
         this.totalHoursByStatus = totalHoursByStatus;
+    }
+
+    public Map<String, Long> getProjectsByCompletionStatus() {
+        return projectsByCompletionStatus;
+    }
+
+    public void setProjectsByCompletionStatus(Map<String, Long> projectsByCompletionStatus) {
+        this.projectsByCompletionStatus = projectsByCompletionStatus;
     }
 }
