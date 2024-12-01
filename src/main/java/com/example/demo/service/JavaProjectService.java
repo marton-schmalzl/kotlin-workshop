@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.demo.service.KotlinProjectServiceKt.isFinished;
+
 @Service("javaProjectService")
 public class JavaProjectService implements ProjectService {
 
@@ -72,6 +74,12 @@ public class JavaProjectService implements ProjectService {
                         )
                 ));
 
+        Map<String, Long> projectsByCompletionStatus = projects.stream()
+                .collect(Collectors.groupingBy(
+                        project -> isFinished(project.getStatus()) ? "Finished" : "Unfinished",
+                        Collectors.counting()
+                ));
+
         Statistics statistics = new Statistics();
         statistics.setTaskSummaries(taskSummaries);
         statistics.setAverageTitleLength(averageTitleLength);
@@ -79,7 +87,19 @@ public class JavaProjectService implements ProjectService {
         statistics.setMostCommonTaskDescription(mostCommonTaskDescription);
         statistics.setTasksByCategory(tasksByCategory);
         statistics.setTotalHoursByStatus(totalHoursByStatus);
+        statistics.setProjectsByCompletionStatus(projectsByCompletionStatus);
 
         return statistics;
+    }
+
+    private boolean isFinished(ProjectStatus status) {
+        switch (status) {
+            case COMPLETED:
+                return true;
+            case PLANNED:
+            case IN_PROGRESS:
+            default:
+                return false;
+        }
     }
 }
